@@ -342,6 +342,28 @@ details.inline pre { white-space: pre-wrap; max-height: 240px; overflow: auto; b
 .reveal { animation: rise .4s ease-out both; }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
 
+.produce-box {
+  margin-top: 14px; padding: 14px 16px; border-radius: 14px;
+  background: var(--surface); border: 1.5px solid var(--line);
+}
+.produce-box-title {
+  display: block; font-size: .88rem; font-weight: 650; color: var(--ink); margin-bottom: 8px;
+}
+.produce-chips {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.produce-chip {
+  appearance: none; border: 1px solid var(--line); background: var(--bg);
+  border-radius: 99px; padding: 4px 11px; font-size: .82rem; font-weight: 550;
+  color: var(--ink-2); cursor: pointer; transition: all .15s ease;
+}
+.produce-chip:hover {
+  border-color: var(--green); color: var(--green-deep); background: var(--green-soft);
+}
+.produce-chip.selected {
+  border-color: var(--green); background: var(--green); color: var(--on-green);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition: none !important; }
   .scan-beam { display: none; }

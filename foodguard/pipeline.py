@@ -106,7 +106,12 @@ def _raw_produce(image, scene, product_name, report, guard, extra: int) -> dict:
     if extra:
         report.warn(f"Raw produce uses one photo; {extra} extra image(s) ignored.")
 
-    if scene["packaged_probability"] > scene["raw_probability"] + guard["category_margin"]:
+    claimed_perishable = False
+    if product_name:
+        p_norm = product_name.lower().strip().replace(" ", "_")
+        claimed_perishable = any(p in p_norm for p in config.SUPPORTED_PRODUCE)
+
+    if not claimed_perishable and scene["packaged_probability"] > scene["raw_probability"] + guard["category_margin"]:
         report.stage("Stage 2 - Category validation", "FAIL",
                      f"Selected 'raw produce' but the image looks like packaged food "
                      f"(packaged {scene['packaged_probability']:.0%} vs raw {scene['raw_probability']:.0%}).")

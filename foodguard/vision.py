@@ -147,9 +147,13 @@ def surface_discoloration(image: Image.Image) -> dict:
     if fg_pixels < 0.05 * fg.size:
         return {"foreground_found": False, "dark_patch_percent": None}
 
-    dark = v < 60
-    brown = (h >= 5) & (h <= 25) & (s > 70) & (v < 130)
-    patches = (dark | brown) & fg
+    # Dark rot: very low brightness
+    dark = v < 70
+    # Brown / yellow-green decay patches (wider hue range to catch tomato wrinkle / mould)
+    brown = (h >= 3) & (h <= 30) & (s > 50) & (v < 150)
+    # Mould: desaturated grey-white patches (high V, low S)
+    mould = (s < 40) & (v > 160) & (v < 240)
+    patches = (dark | brown | mould) & fg
     pct = 100.0 * patches.sum() / fg_pixels
     return {"foreground_found": True, "dark_patch_percent": round(float(pct), 1)}
 

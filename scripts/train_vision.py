@@ -39,8 +39,8 @@ def rgb_loader(path: str) -> Image.Image:
 
 def make_loader(split: str, transform, batch_size: int, shuffle: bool):
     ds = datasets.ImageFolder(config.DATASET_VISION_DIR / split, transform=transform, loader=rgb_loader)
-    dl = DataLoader(ds, batch_size=batch_size, shuffle=shuffle, num_workers=6,
-                    pin_memory=True, persistent_workers=True)
+    dl = DataLoader(ds, batch_size=batch_size, shuffle=shuffle, num_workers=0,
+                    pin_memory=(DEVICE.type == "cuda"))
     return ds, dl
 
 
@@ -48,7 +48,8 @@ def run_epoch(model, loader, criterion, optimizer=None, scheduler=None, scaler=N
     training = optimizer is not None
     model.train(training)
     total_loss, preds, targets = 0.0, [], []
-    for images, labels in loader:
+    total_batches = len(loader)
+    for b_idx, (images, labels) in enumerate(loader, 1):
         images, labels = images.to(DEVICE, non_blocking=True), labels.to(DEVICE, non_blocking=True)
         with torch.set_grad_enabled(training), torch.autocast(DEVICE.type, dtype=torch.float16,
                                                               enabled=DEVICE.type == "cuda"):
@@ -64,6 +65,8 @@ def run_epoch(model, loader, criterion, optimizer=None, scheduler=None, scaler=N
         total_loss += loss.item() * images.size(0)
         preds.append(logits.argmax(1).cpu())
         targets.append(labels.cpu())
+        if training and (b_idx % 50 == 0 or b_idx == total_batches):
+            print(f"  batch {b_idx}/{total_batches} loss {loss.item():.4f}", flush=True)
     preds, targets = torch.cat(preds).numpy(), torch.cat(targets).numpy()
     return {
         "loss": total_loss / len(targets),

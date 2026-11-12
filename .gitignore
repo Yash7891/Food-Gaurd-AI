@@ -11,3 +11,7 @@ venv/
 .idea/
 *.log
 ~$*.docx
+# temp / scratch files
+Screenshot*.png
+cmd1.txt
+spoilage_multi.pt
