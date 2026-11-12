@@ -25,6 +25,11 @@ SCENE_PROMPTS = {
         "a photo of a rotten or moldy vegetable",
         "a close-up photo of a single fruit or vegetable",
         "a photo of fruits and vegetables at an Indian market",
+        "a photo of a slice or loaf of bread",
+        "a photo of fresh or moldy bread",
+        "a photo of fresh paneer or cottage cheese",
+        "a photo of a white paneer block",
+        "a photo of milk",
     ],
     "packaged_solid": [
         "a photo of a packet of chips or namkeen",
@@ -104,6 +109,8 @@ PRODUCE_NAMES = {
     "green_chilli": ["green chilli"],
     "pear": ["pear"],
     "coconut": ["coconut"],
+    "bread": ["bread", "slice of bread", "loaf of bread"],
+    "paneer_milk": ["paneer", "paneer cheese", "milk packet", "milk carton", "curd"],
 }
 
 

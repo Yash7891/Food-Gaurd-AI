@@ -37,7 +37,7 @@ def evaluate(split: str = "test") -> dict:
     model, class_names = get_spoilage_model()
     ds = datasets.ImageFolder(config.DATASET_VISION_DIR / split, transform=EVAL_TRANSFORM, loader=rgb_loader)
     assert ds.classes == class_names, "Class order mismatch between dataset and checkpoint"
-    dl = DataLoader(ds, batch_size=128, num_workers=4)
+    dl = DataLoader(ds, batch_size=64, num_workers=0)
 
     probs, targets = [], []
     with torch.no_grad():
@@ -60,7 +60,7 @@ def evaluate(split: str = "test") -> dict:
     metrics = {
         "split": split,
         "images": int(len(targets)),
-        "accuracy_12_class": float((preds == targets).mean()),
+        "accuracy_all_classes": float((preds == targets).mean()),
         "accuracy_fresh_vs_stale": float(((p_fresh >= 0.5) == true_fresh).mean()),
         "decision_rule": {
             "safe": int((decision == "SAFE").sum()),
@@ -87,12 +87,12 @@ def evaluate(split: str = "test") -> dict:
                     color="white" if cm[i, j] > cm.max() / 2 else "black", fontsize=8)
     ax.set_xlabel("Predicted")
     ax.set_ylabel("True")
-    ax.set_title(f"MobileNetV2 spoilage - {split} split (acc {metrics['accuracy_12_class']:.3f})")
+    ax.set_title(f"MobileNetV2 spoilage - {split} split (acc {metrics['accuracy_all_classes']:.3f})")
     fig.tight_layout()
     fig.savefig(config.MODELS_DIR / f"confusion_matrix_{split}.png", dpi=130)
 
     print(f"\n== {split} ({metrics['images']} images) ==")
-    print(f"12-class accuracy      : {metrics['accuracy_12_class']:.4f}")
+    print(f"Overall class accuracy : {metrics['accuracy_all_classes']:.4f}")
     print(f"Fresh-vs-stale accuracy: {metrics['accuracy_fresh_vs_stale']:.4f}")
     print(f"Decision rule          : {metrics['decision_rule']}")
     print(classification_report(targets, preds, target_names=class_names, digits=3, zero_division=0))

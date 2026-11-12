@@ -47,5 +47,85 @@
     "storage": "Ripen at room temperature, stem side down; refrigerate only once fully ripe.",
     "shelf_life": "3-5 days ripe at room temperature, about 1 week more refrigerated",
     "spoilage_signs": "Wrinkled skin, leaking juice, dark soft spots, white or grey fuzzy mould"
+  },
+  "potato": {
+    "name": "Potato", "local_name": "Aloo", "kind": "Vegetable (Tuber)",
+    "energy_kcal": 77, "carbohydrate_g": 17.5, "fibre_g": 2.2, "sugar_g": 0.8, "vitamin_c_mg": 19.7, "potassium_mg": 421,
+    "known_for": ["High in potassium and complex carbohydrates", "Good source of vitamin B6 and vitamin C"],
+    "storage": "Store in a cool, dark, dry place with good ventilation; do not refrigerate or store next to onions.",
+    "shelf_life": "2-4 weeks in a cool pantry, 2-3 months in root cellars",
+    "spoilage_signs": "Green patches (solanine), sprouting eyes, soft wrinkled texture, rotting foul smell"
+  },
+  "onion": {
+    "name": "Onion", "local_name": "Pyaz", "kind": "Vegetable (Bulb)",
+    "energy_kcal": 40, "carbohydrate_g": 9.3, "fibre_g": 1.7, "sugar_g": 4.2, "vitamin_c_mg": 7.4, "potassium_mg": 146,
+    "known_for": ["Rich in quercetin and sulfur antioxidants", "Prebiotic inulin for gut health"],
+    "storage": "Keep in a cool, dry, ventilated basket; keep separate from potatoes.",
+    "shelf_life": "2-4 weeks in a cool dry pantry",
+    "spoilage_signs": "Soft or mushy spots, black mold on outer layers, sprouting shoots, foul odor"
+  },
+  "mango": {
+    "name": "Mango", "local_name": "Aam", "kind": "Fruit",
+    "energy_kcal": 60, "carbohydrate_g": 15.0, "fibre_g": 1.6, "sugar_g": 13.7, "vitamin_c_mg": 36.4, "potassium_mg": 168,
+    "known_for": ["High in vitamins A and C", "Rich in polyphenols including mangiferin"],
+    "storage": "Ripen at room temperature; once ripe, refrigerate up to 5 days.",
+    "shelf_life": "2-5 days at room temperature, up to 1 week refrigerated",
+    "spoilage_signs": "Large black sunken bruises, alcoholic or fermented odor, mushy texture, white mold"
+  },
+  "cucumber": {
+    "name": "Cucumber", "local_name": "Kheera", "kind": "Vegetable",
+    "energy_kcal": 15, "carbohydrate_g": 3.6, "fibre_g": 0.5, "sugar_g": 1.7, "vitamin_c_mg": 2.8, "potassium_mg": 147,
+    "known_for": ["Over 95% water, excellent for hydration", "Contains cucurbitacins and antioxidants"],
+    "storage": "Store in the crisper drawer wrapped loosely in paper towel; keep away from ethylene producers.",
+    "shelf_life": "1 week refrigerated",
+    "spoilage_signs": "Yellowing skin, slimy surface, soft and squishy ends, white mold"
+  },
+  "carrot": {
+    "name": "Carrot", "local_name": "Gajar", "kind": "Vegetable (Root)",
+    "energy_kcal": 41, "carbohydrate_g": 9.6, "fibre_g": 2.8, "sugar_g": 4.7, "vitamin_c_mg": 5.9, "potassium_mg": 320,
+    "known_for": ["Exceptional source of beta-carotene (provitamin A)", "Supports eye and immune health"],
+    "storage": "Cut green tops off, keep in a plastic bag with paper towel in refrigerator crisper.",
+    "shelf_life": "2-4 weeks refrigerated",
+    "spoilage_signs": "Rubbery or bendy texture, slimy dark spots, white fungal growth, rot"
+  },
+  "strawberry": {
+    "name": "Strawberry", "local_name": "Strawberry", "kind": "Fruit (Berry)",
+    "energy_kcal": 32, "carbohydrate_g": 7.7, "fibre_g": 2.0, "sugar_g": 4.9, "vitamin_c_mg": 58.8, "potassium_mg": 153,
+    "known_for": ["Very high in vitamin C and anthocyanin pigments", "Low glycemic index and calorie density"],
+    "storage": "Do not wash until ready to eat; store in single layer in ventilated container in fridge.",
+    "shelf_life": "3-5 days refrigerated",
+    "spoilage_signs": "White or grey fuzzy mold (Botrytis), leaking juice, mushy discolored patches"
+  },
+  "lemon": {
+    "name": "Lemon", "local_name": "Nimbu", "kind": "Fruit (Citrus)",
+    "energy_kcal": 29, "carbohydrate_g": 9.3, "fibre_g": 2.8, "sugar_g": 2.5, "vitamin_c_mg": 53.0, "potassium_mg": 138,
+    "known_for": ["Rich in vitamin C and citric acid", "Antibacterial and digestive aid"],
+    "storage": "Store in the refrigerator crisper in a sealed bag or airtight container for maximum freshness.",
+    "shelf_life": "1-2 weeks at room temperature, 3-4 weeks refrigerated",
+    "spoilage_signs": "Hard, dried-out peel, green or blue fuzzy mold, mushy soft spots"
+  },
+  "grapes": {
+    "name": "Grapes", "local_name": "Angoor", "kind": "Fruit",
+    "energy_kcal": 69, "carbohydrate_g": 18.1, "fibre_g": 0.9, "sugar_g": 15.5, "vitamin_c_mg": 3.2, "potassium_mg": 191,
+    "known_for": ["Contains resveratrol and powerful proanthocyanidins", "Natural quick energy"],
+    "storage": "Store unwashed in their original perforated bag in the crisper drawer.",
+    "shelf_life": "1-2 weeks refrigerated",
+    "spoilage_signs": "Brown or shrivelled berries, white fuzzy mold at stems, sour vinegary smell, detachment"
+  },
+  "bread": {
+    "name": "Bread", "local_name": "Bread / Pav", "kind": "Bakery / Grain",
+    "energy_kcal": 265, "carbohydrate_g": 49.0, "fibre_g": 2.7, "sugar_g": 5.0, "vitamin_c_mg": 0.0, "potassium_mg": 115,
+    "known_for": ["Carbohydrate staple providing daily energy", "Fortified with B-complex vitamins and iron"],
+    "storage": "Keep in a cool, dry breadbox or airtight container; avoid the fridge which accelerates staling.",
+    "shelf_life": "3-5 days at room temperature, up to 3 months frozen",
+    "spoilage_signs": "Green, blue, or white fuzzy mold colonies (Penicillium), hard stale crumb, sour yeast odor"
+  },
+  "paneer_milk": {
+    "name": "Paneer & Dairy Milk", "local_name": "Paneer / Doodh", "kind": "Fresh Dairy",
+    "energy_kcal": 265, "carbohydrate_g": 3.4, "fibre_g": 0.0, "sugar_g": 3.0, "vitamin_c_mg": 0.0, "potassium_mg": 100,
+    "known_for": ["Rich source of milk protein (casein) and calcium", "Essential building blocks for muscles and bones"],
+    "storage": "Always keep refrigerated below 4°C. Submerge paneer block in fresh water changed daily.",
+    "shelf_life": "3-4 days refrigerated once opened",
+    "spoilage_signs": "Yellowing or pinkish discoloration, slimy surface, sour curdled smell, bitter taste"
   }
 }

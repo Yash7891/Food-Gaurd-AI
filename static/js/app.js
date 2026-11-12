@@ -88,9 +88,25 @@ function onCategoryChange() {
     ? "One clear photo of the item, filling the frame."
     : "Up to 3 photos: the nutrition table first, then the front of the pack.";
   form.querySelectorAll(".packaged-only").forEach((n) => { n.hidden = raw; });
+  const produceBox = document.getElementById("produce-box");
+  if (produceBox) produceBox.hidden = !raw;
   if (files.length > maxFiles()) { files = files.slice(0, maxFiles()); renderPreviews(); }
 }
 form.querySelectorAll("input[name=category]").forEach((r) => r.addEventListener("change", onCategoryChange));
+
+document.querySelectorAll(".produce-chip").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const item = btn.dataset.item;
+    const nameInput = form.querySelector("input[name=product_name]");
+    const details = form.querySelector(".extras");
+    if (nameInput) {
+      nameInput.value = item.replace("_", " ");
+      if (details) details.open = true;
+    }
+    document.querySelectorAll(".produce-chip").forEach((b) => b.classList.remove("selected"));
+    btn.classList.add("selected");
+  });
+});
 
 function addFiles(list) {
   for (const f of list) {

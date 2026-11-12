@@ -17,13 +17,17 @@ CLIP_MODEL_NAME = "openai/clip-vit-base-patch32"
 IMAGE_SIZE = 224
 
 # Produce the spoilage CNN was trained on (folder names are fresh_<type> / stale_<type>).
-SUPPORTED_PRODUCE = ["apple", "banana", "bitter_gourd", "capsicum", "orange", "tomato"]
+SUPPORTED_PRODUCE = [
+    "apple", "banana", "bitter_gourd", "bread", "capsicum", "carrot",
+    "cucumber", "grapes", "lemon", "mango", "onion", "orange",
+    "paneer_milk", "potato", "strawberry", "tomato"
+]
 
 CATEGORIES = {
-    "raw_produce": "Raw produce (fruit / vegetable)",
-    "packaged_solid": "Packaged - Solid food",
-    "packaged_liquid": "Packaged - Liquid beverage",
-    "packaged_exempt": "Packaged - Exempt (oil, ghee, honey, dried fruit)",
+    "raw_produce": "Raw produce & perishables (fruits, vegetables, bread, dairy)",
+    "packaged_solid": "Packaged food (snacks, noodles, biscuits, ready-to-eat)",
+    "packaged_liquid": "Packaged beverages (juices, sodas, dairy drinks)",
+    "packaged_exempt": "Packaged staples (oils, ghee, honey, dry fruits)",
 }
 PACKAGED_CATEGORIES = ("packaged_solid", "packaged_liquid", "packaged_exempt")
 

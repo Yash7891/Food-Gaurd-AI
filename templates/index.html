@@ -47,13 +47,13 @@
             'packaged_exempt': '<path d="M17 6h14v5H17z"/><path d="M15 11h18v28a3 3 0 0 1-3 3H18a3 3 0 0 1-3-3V11Z"/><path d="M24 20c-3 4-5 6-5 9a5 5 0 0 0 10 0c0-3-2-5-5-9Z"/>'
           } %}
           {% set blurb = {
-            'raw_produce': supported|join(', '),
-            'packaged_solid': 'Chips, biscuits, chocolate, noodles',
-            'packaged_liquid': 'Juice, soft drinks, flavoured milk',
-            'packaged_exempt': 'Oil, ghee, honey, dried fruit'
+            'raw_produce': '16 foods: Fruits, Veggies, Bread & Paneer',
+            'packaged_solid': 'Chips, biscuits, noodles, ready-to-eat',
+            'packaged_liquid': 'Fruit juice, cold drinks, dairy beverages',
+            'packaged_exempt': 'Cooking oils, pure ghee, honey, dry fruits'
           } %}
-          {% set short = {'raw_produce': 'Fruit or vegetable', 'packaged_solid': 'Packaged food',
-                          'packaged_liquid': 'Packaged drink', 'packaged_exempt': 'Oil, ghee or honey'} %}
+          {% set short = {'raw_produce': 'Produce & Perishables', 'packaged_solid': 'Packaged Solid Food',
+                          'packaged_liquid': 'Packaged Beverage', 'packaged_exempt': 'Oils, Ghee & Staples'} %}
           {% for key in categories %}
           <label class="cat">
             <input type="radio" name="category" value="{{ key }}" {% if loop.first %}checked{% endif %}>
@@ -64,6 +64,14 @@
             </span>
           </label>
           {% endfor %}
+        </div>
+        <div class="produce-box" id="produce-box">
+          <span class="produce-box-title">Supported fresh foods (click to select):</span>
+          <div class="produce-chips">
+            {% for item in supported %}
+            <button type="button" class="produce-chip" data-item="{{ item }}">{{ item|title }}</button>
+            {% endfor %}
+          </div>
         </div>
       </fieldset>
 

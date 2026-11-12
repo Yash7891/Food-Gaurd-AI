@@ -48,6 +48,9 @@ PRODUCE_ALIASES = {
     "lemon": ["lemon", "nimbu"],
     "guava": ["guava", "amrood"],
     "pomegranate": ["pomegranate", "anar"],
+    "strawberry": ["strawberry", "strawberries"],
+    "bread": ["bread", "pav", "loaf", "slice of bread"],
+    "paneer_milk": ["paneer", "milk", "doodh", "curd", "cottage cheese"],
 }
 
 OFF_FIELDS = "code,product_name,brands,nutriments,image_front_url,quantity,categories_tags"
