@@ -36,8 +36,8 @@ Food-safety detection for Indian consumers. Upload a photo and get one clear ver
 You need Python 3.10 or newer (3.12 was used) and Git. The trained spoilage model (`models/spoilage_mobilenetv2.pt`) is included in the repository, so **no training is needed** to run the app.
 
 ```powershell
-git clone https://github.com/OMx0777/FOOD.git
-cd FOOD
+git clone https://github.com/Yash7891/Food-Gaurd-AI.git
+cd Food-Gaurd-AI
 python -m venv .venv
 .venv\Scripts\activate
 
