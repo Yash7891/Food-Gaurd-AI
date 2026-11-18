@@ -1,24 +1,5 @@
 # FoodGuard AI
 
-## 📖 Project Overview
-FoodGuard AI is an end‑to‑end food‑safety verification system focused on the Indian market. It combines computer‑vision models (MobileNetV2 for spoilage detection, CLIP for out‑of‑food filtering, EasyOCR for nutrition label extraction) with domain‑specific rules from the FSSAI guidelines to provide a clear safety verdict for raw produce and packaged foods.
-
----
-
-## 🏗️ Architecture
-```mermaid
-flowchart TD
-    A[User uploads image] --> B{Image type?}
-    B -->|Raw produce| C[MobileNetV2 (Spoilage CNN)]
-    B -->|Packaged food| D[EasyOCR + CLIP]
-    C --> E[Grad‑CAM visualization]
-    D --> F[Nutrition extraction]
-    E & F --> G[Guardrail checks]
-    G --> H[Health score & verdict]
-    H --> I[Web UI display]
-```
----
-
 Food‑safety detection for Indian consumers. Upload a photo and get a clear verdict:
 **SAFE / CAUTION / UNSAFE**, or **REJECTED / MISMATCH** when the image is unusable.
 
@@ -107,6 +88,51 @@ Distributed under the **MIT License**. See `LICENSE` for details.
 
 **Yash Minde** – <mindeyn7891@gmail.com>
 GitHub: [Yash7891](https://github.com/Yash7891)
+
+---
+
+*For any questions or issues, open a GitHub Issue or contact me directly.*
+
+## 📖 Project Overview
+FoodGuard AI is an end‑to‑end AI system designed to help Indian consumers assess the safety of food items using a smartphone camera. The project arose from the need for an affordable, accessible tool that can:
+- Detect spoilage in fresh produce (fruits, vegetables) using a fine‑tuned MobileNetV2 model.
+- Parse nutrition information from packaged food labels with EasyOCR and verify compliance against the Indian FSSAI HFSS (high‑fat, sugar, salt) regulations.
+- Provide clear, actionable health scores and visual explanations (Grad‑CAM heatmaps, OCR overlays) to increase user trust.
+
+### Problem Statement
+Food safety incidents in India remain high due to limited access to laboratory testing and reliance on unreliable labeling. Consumers often lack the expertise to interpret nutritional panels or detect early spoilage. FoodGuard AI aims to democratise food safety by leveraging computer vision and language‑vision models that run locally on consumer devices.
+
+### Architecture
+The system consists of three staged guardrails:
+1. **Out‑of‑Food Filter (Stage 1)** – Uses CLIP (ViT‑B/32) to quickly reject non‑food images.
+2. **Category Validation (Stage 2)** – Determines whether the image is raw produce, packaged solid, packaged liquid, or exempt (oil, honey, etc.), and validates the selected category.
+3. **Identity & Health Assessment (Stage 3)** –
+   - For raw produce: a MobileNetV2‑based classifier predicts freshness and generates a Grad‑CAM heatmap.
+   - For packaged food: EasyOCR extracts the nutrition table, which is cross‑checked against FSSAI limits; optional barcode lookup via Open Food Facts.
+   - A health‑score algorithm aggregates nutrient limits, expiry dates, and spoilage confidence into a 0‑100 rating.
+
+All components are wrapped in a Flask web server (`app.py`) that serves a lightweight HTML UI.
+
+### Dataset & Training
+- **Produce dataset** – 2,208 images covering six common Indian fruits/vegetables, augmented 100× per source image. Split by source to avoid leakage.
+- **Nutrition panel dataset** – Synthetic images generated from the FSSAI nutrient database, combined with real label scans.
+- **Training** – MobileNetV2 fine‑tuned for 97.2 % top‑1 accuracy on spoilage; OCR pipeline leverages pre‑trained EasyOCR weights.
+
+### Evaluation & Results
+| Metric | Value |
+|--------|-------|
+| Produce classification accuracy | **97.2 %** (macro F1 0.967) |
+| Fresh vs. stale classification | **97.1 %** |
+| Overall decision accuracy (SAFE/UNSAFE) | **99.3 %** |
+| OCR extraction accuracy (nutrition fields) | **94 %** |
+
+The system successfully flags unsafe items while maintaining a low false‑positive rate, crucial for user acceptance.
+
+### Future Work
+- Expand the produce catalog beyond six items.
+- Add multilingual support for ingredient lists.
+- Deploy as a lightweight Android app using TensorFlow Lite.
+- Integrate a crowdsourced reporting mechanism for community‑driven updates.
 
 ---
 
