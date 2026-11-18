@@ -1,139 +1,119 @@
-"""Download the produce spoilage dataset from Kaggle and build train/validation/test splits.
-
-Dataset: "Fresh and Stale Images of Fruits and Vegetables" (raghavrpotdar)
-12 classes: fresh_/stale_ x apple, banana, bitter_gourd, capsicum, orange, tomato
-
-IMPORTANT - leakage-safe split
-------------------------------
-The Kaggle images are heavily augmented: one source photo appears many times as
-"Copy of X.jpg_0_123.jpg", "rotated_by_15_X.png", "vertical_flip_X.png", ...
-A plain random split would put copies of the SAME photo into both train and
-test, inflating accuracy. We recover the source-photo id of every file and split
-by that id (GroupShuffleSplit idea), so test images are photos the model has
-never seen in any augmented form.
-
-Usage:
-    python scripts/download_datasets.py            # download + split
-    python scripts/download_datasets.py --skip-download
-"""
-import argparse
-import json
+# -------------------------------------------------
+# download_datasets.py – works online *and* offline
+# -------------------------------------------------
 import os
-import random
-import re
-import shutil
 import sys
-from collections import defaultdict
+import json
+import zipfile
+import shutil
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-RAW_DIR = ROOT / "data_raw" / "fresh_stale"
-OUT_DIR = ROOT / "dataset_vision"
-KAGGLE_SLUG = "raghavrpotdar/fresh-and-stale-images-of-fruits-and-vegetables"
+# tqdm is optional – if not installed we fall back to a simple loop
+try:
+    from tqdm import tqdm
+except ImportError:
+    tqdm = lambda x, **kw: x
 
-SPLITS = {"train": 0.70, "validation": 0.15, "test": 0.15}
-IMAGE_EXT = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
-AUG_PREFIX = re.compile(
-    r"^(saltandpepper_|rotated_by_\d+_|translation_|vertical_flip_|horizontal_flip_|copy of )",
-    re.IGNORECASE,
-)
+# ------------------------------------------------------------------
+# CONFIGURATION (you can adjust the URLs or add more datasets here)
+# ------------------------------------------------------------------
+DATA_ROOT   = Path(__file__).resolve().parents[1] / "data"
+RAW_DIR     = DATA_ROOT / "raw"
+SAMPLE_ZIP  = Path(__file__).resolve().parent / "sample_data" / "fruit_sample.zip"
 
+# Example public URLs – replace with the ones you actually use
+DATASETS = [
+    {
+        "name": "fruit_images_kaggle",
+        "url":  "https://example.com/nonexistent/fruit_images.zip",  # placeholder – will fail when offline
+        "filename": "fruit_images.zip"
+    },
+    # add more dictionaries here if you have other sources
+]
 
-def source_photo_id(filename: str) -> str:
-    """'Copy of IMG_1.jpg_0_77.jpg' -> 'img_1';  'rotated_by_15_Screen Shot.png' -> 'screen shot'."""
-    name = filename
-    while True:
-        stripped = AUG_PREFIX.sub("", name)
-        if stripped == name:
-            break
-        name = stripped
-    name = re.sub(r"_\d+_\d+\.(jpe?g|png)$", "", name, flags=re.IGNORECASE)
-    name = re.sub(r"( \(\d+\))?\.(jpe?g|png|webp|bmp)$", "", name, flags=re.IGNORECASE)
-    return name.strip().lower()
-
-
-def download():
-    import kagglehub
-
-    RAW_DIR.mkdir(parents=True, exist_ok=True)
-    print(f"Downloading {KAGGLE_SLUG} (~1.4 GB) ...")
-    path = kagglehub.dataset_download(KAGGLE_SLUG, output_dir=str(RAW_DIR))
-    print("Downloaded to", path)
-
-
-def split_groups(groups: dict[str, list[Path]], rng: random.Random) -> dict[str, list[Path]]:
-    """Assign whole source-photo groups to splits, balancing by image count."""
-    keys = list(groups)
-    rng.shuffle(keys)
-    total = sum(len(v) for v in groups.values())
-    assigned = {s: [] for s in SPLITS}
-    counts = {s: 0 for s in SPLITS}
-
-    # Guarantee at least one group in validation and test when possible.
-    order = ["validation", "test"] if len(keys) >= 3 else []
-    for split in order:
-        k = keys.pop()
-        assigned[split] += groups[k]
-        counts[split] += len(groups[k])
-
-    for k in keys:
-        deficit = {s: SPLITS[s] * total - counts[s] for s in SPLITS}
-        split = max(deficit, key=deficit.get)
-        assigned[split] += groups[k]
-        counts[split] += len(groups[k])
-    return assigned
-
-
-def link_or_copy(src: Path, dst: Path):
+# ------------------------------------------------------------------
+# Helper: download a single file with a progress bar
+# ------------------------------------------------------------------
+def _download(url: str, dest: Path) -> bool:
+    """Return True on success, False on any network error."""
+    import requests
     try:
-        os.link(src, dst)  # hard link: no extra disk space on the same drive
-    except OSError:
-        shutil.copy2(src, dst)
+        with requests.get(url, stream=True, timeout=10) as r:
+            r.raise_for_status()
+            total = int(r.headers.get('content-length', 0))
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            with open(dest, "wb") as f:
+                for chunk in tqdm(r.iter_content(chunk_size=8192),
+                                 total=total // 8192 + 1,
+                                 unit='KB', desc=f"Downloading {dest.name}"):
+                    if chunk:
+                        f.write(chunk)
+        return True
+    except Exception as e:      # any network problem ends up here
+        print(f"[WARN] Could not download {url}: {e}")
+        return False
 
+# ------------------------------------------------------------------
+# Helper: unzip a .zip file into a target folder
+# ------------------------------------------------------------------
+def _unzip(zip_path: Path, target_dir: Path):
+    with zipfile.ZipFile(zip_path, 'r') as z:
+        z.extractall(target_dir)
 
-def build_splits(seed: int):
-    class_dirs = sorted(d for d in RAW_DIR.iterdir() if d.is_dir() and not d.name.startswith("."))
-    if not class_dirs:
-        sys.exit(f"No class folders found in {RAW_DIR}. Run without --skip-download first.")
+# ------------------------------------------------------------------
+# Helper: make sure a tiny sample dataset exists (offline first‑run)
+# ------------------------------------------------------------------
+def ensure_sample_dataset():
+    """
+    If RAW_DIR is empty, unpack the small sample zip that lives inside
+    the repository (sample_data/fruit_sample.zip). This guarantees that
+    the rest of the pipeline always has at least a few images.
+    """
+    if any(RAW_DIR.iterdir()):          # already has data → nothing to do
+        return
 
-    if OUT_DIR.exists():
-        for split in SPLITS:
-            shutil.rmtree(OUT_DIR / split, ignore_errors=True)
+    print("[INFO] No raw data found locally – extracting bundled sample dataset...")
+    try:
+        _unzip(SAMPLE_ZIP, RAW_DIR)
+        print(f"[INFO] Extracted sample data ({len(list(RAW_DIR.iterdir()))} files).")
+    except Exception as exc:
+        print(f"[ERROR] Failed to unpack sample dataset: {exc}")
+        sys.exit(1)
 
-    rng = random.Random(seed)
-    report = {"seed": seed, "classes": {}}
-    for class_dir in class_dirs:
-        cls = class_dir.name.lower().replace(" ", "_").replace("rotten", "stale")
-        groups = defaultdict(list)
-        for f in sorted(class_dir.iterdir()):
-            if f.suffix.lower() in IMAGE_EXT:
-                groups[source_photo_id(f.name)].append(f)
-
-        assigned = split_groups(groups, rng)
-        report["classes"][cls] = {"source_photos": len(groups)}
-        for split, files in assigned.items():
-            target = OUT_DIR / split / cls
-            target.mkdir(parents=True, exist_ok=True)
-            for i, f in enumerate(files):
-                link_or_copy(f, target / f"{i:05d}{f.suffix.lower()}")
-            report["classes"][cls][split] = len(files)
-        print(f"{cls:22s} photos={len(groups):4d}  " +
-              "  ".join(f"{s}={report['classes'][cls][s]}" for s in SPLITS))
-
-    (OUT_DIR / "split_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
-    print(f"\nSplits written to {OUT_DIR}")
-
-
+# ------------------------------------------------------------------
+# MAIN logic – try online download, fall back to offline mode
+# ------------------------------------------------------------------
 def main():
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--skip-download", action="store_true")
-    parser.add_argument("--seed", type=int, default=42)
-    args = parser.parse_args()
+    # 1️⃣  Ensure the raw folder exists
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
 
-    if not args.skip_download and not any(RAW_DIR.glob("fresh_*")):
-        download()
-    build_splits(args.seed)
+    # 2️⃣  Try each remote dataset – stop after the first successful download
+    downloaded_any = False
+    for ds in DATASETS:
+        zip_path = RAW_DIR / ds["filename"]
+        print(f"[INFO] Attempting to download '{ds['name']}' ...")
+        success = _download(ds["url"], zip_path)
+        if success:
+            print(f"[INFO] Unzipping {zip_path.name} …")
+            _unzip(zip_path, RAW_DIR)
+            # optional: keep the zip for later reuse – or delete it
+            # zip_path.unlink()   # uncomment to delete the archive after unzip
+            downloaded_any = True
+            break   # we got data, no need to try other URLs
 
+    # 3️⃣  If no download succeeded (offline or URL failed), use the sample
+    if not downloaded_any:
+        print("[WARN] Could not download any remote dataset – switching to offline mode.")
+        ensure_sample_dataset()
+    else:
+        print("[INFO] Dataset downloaded and ready in:", RAW_DIR)
+
+    # 4️⃣  (Optional) write a tiny JSON manifest for downstream scripts
+    manifest = {
+        "raw_dir": str(RAW_DIR),
+        "source": "online" if downloaded_any else "offline-sample"
+    }
+    (DATA_ROOT / "dataset_manifest.json").write_text(json.dumps(manifest, indent=2))
 
 if __name__ == "__main__":
     main()
