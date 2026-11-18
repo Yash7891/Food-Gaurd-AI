@@ -1,5 +1,24 @@
 # FoodGuard AI
 
+## 📖 Project Overview
+FoodGuard AI is an end‑to‑end food‑safety verification system focused on the Indian market. It combines computer‑vision models (MobileNetV2 for spoilage detection, CLIP for out‑of‑food filtering, EasyOCR for nutrition label extraction) with domain‑specific rules from the FSSAI guidelines to provide a clear safety verdict for raw produce and packaged foods.
+
+---
+
+## 🏗️ Architecture
+```mermaid
+flowchart TD
+    A[User uploads image] --> B{Image type?}
+    B -->|Raw produce| C[MobileNetV2 (Spoilage CNN)]
+    B -->|Packaged food| D[EasyOCR + CLIP]
+    C --> E[Grad‑CAM visualization]
+    D --> F[Nutrition extraction]
+    E & F --> G[Guardrail checks]
+    G --> H[Health score & verdict]
+    H --> I[Web UI display]
+```
+---
+
 Food‑safety detection for Indian consumers. Upload a photo and get a clear verdict:
 **SAFE / CAUTION / UNSAFE**, or **REJECTED / MISMATCH** when the image is unusable.
 
